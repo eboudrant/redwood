@@ -92,6 +92,24 @@ public class Node internal constructor(
   public var requestedMaxHeight: Float
     get() = Yoga.YGNodeStyleGetMaxHeight(native).value
     set(value) = Yoga.YGNodeStyleSetMaxHeight(native, value)
+  public var requestedWidthPercent: Float
+    get() = Yoga.YGNodeStyleGetWidth(native).value
+    set(value) = Yoga.YGNodeStyleSetWidthPercent(native, value)
+  public var requestedHeightPercent: Float
+    get() = Yoga.YGNodeStyleGetHeight(native).value
+    set(value) = Yoga.YGNodeStyleSetHeightPercent(native, value)
+  public var requestedMinWidthPercent: Float
+    get() = Yoga.YGNodeStyleGetMinWidth(native).value
+    set(value) = Yoga.YGNodeStyleSetMinWidthPercent(native, value)
+  public var requestedMinHeightPercent: Float
+    get() = Yoga.YGNodeStyleGetMinHeight(native).value
+    set(value) = Yoga.YGNodeStyleSetMinHeightPercent(native, value)
+  public var requestedMaxWidthPercent: Float
+    get() = Yoga.YGNodeStyleGetMaxWidth(native).value
+    set(value) = Yoga.YGNodeStyleSetMaxWidthPercent(native, value)
+  public var requestedMaxHeightPercent: Float
+    get() = Yoga.YGNodeStyleGetMaxHeight(native).value
+    set(value) = Yoga.YGNodeStyleSetMaxHeightPercent(native, value)
   public var measureCallback: MeasureCallback?
     get() = (native.measure.noContext as MeasureCallbackCompat?)?.callback
     set(value) = Yoga.YGNodeSetMeasureFunc(native, value?.let(::MeasureCallbackCompat))

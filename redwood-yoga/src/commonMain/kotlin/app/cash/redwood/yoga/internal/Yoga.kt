@@ -933,6 +933,78 @@ internal object Yoga {
     ) { obj: YGStyle -> obj.maxDimensions }
   }
 
+  fun YGNodeStyleSetWidthPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionWidth,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.dimensions }
+  }
+
+  fun YGNodeStyleSetHeightPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionHeight,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.dimensions }
+  }
+
+  fun YGNodeStyleSetMinWidthPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionWidth,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.minDimensions }
+  }
+
+  fun YGNodeStyleSetMinHeightPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionHeight,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.minDimensions }
+  }
+
+  fun YGNodeStyleSetMaxWidthPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionWidth,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.maxDimensions }
+  }
+
+  fun YGNodeStyleSetMaxHeightPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionHeight,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.maxDimensions }
+  }
+
   fun YGNodeLayoutGetLeft(node: YGNode): Float {
     return node.layout!!.position[YGEdge.YGEdgeLeft.ordinal]
   }
