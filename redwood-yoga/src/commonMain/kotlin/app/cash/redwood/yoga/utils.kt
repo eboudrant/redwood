@@ -23,6 +23,7 @@ import app.cash.redwood.yoga.internal.enums.YGFlexDirection
 import app.cash.redwood.yoga.internal.enums.YGJustify
 import app.cash.redwood.yoga.internal.enums.YGGutter
 import app.cash.redwood.yoga.internal.enums.YGMeasureMode
+import app.cash.redwood.yoga.internal.enums.YGWrap
 import app.cash.redwood.yoga.internal.interfaces.YGMeasureFunc
 
 internal fun Direction.toYoga() = when (this) {
@@ -57,6 +58,19 @@ internal fun AlignItems.toYoga() = when (this) {
   AlignItems.Baseline -> YGAlign.YGAlignBaseline
   AlignItems.Stretch -> YGAlign.YGAlignStretch
   else -> throw AssertionError()
+}
+
+internal fun FlexWrap.toYoga() = when (this) {
+  FlexWrap.NoWrap -> YGWrap.YGWrapNoWrap
+  FlexWrap.Wrap -> YGWrap.YGWrapWrap
+  FlexWrap.WrapReverse -> YGWrap.YGWrapWrapReverse
+  else -> throw AssertionError()
+}
+
+internal fun YGWrap.toFlexWrap() = when (this) {
+  YGWrap.YGWrapNoWrap -> FlexWrap.NoWrap
+  YGWrap.YGWrapWrap -> FlexWrap.Wrap
+  YGWrap.YGWrapWrapReverse -> FlexWrap.WrapReverse
 }
 
 internal fun Gutter.toYoga() = when (this) {

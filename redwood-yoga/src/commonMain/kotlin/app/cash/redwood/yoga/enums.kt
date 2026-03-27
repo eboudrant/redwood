@@ -162,6 +162,28 @@ public value class AlignSelf private constructor(private val ordinal: Int) {
 }
 
 /**
+ * Controls whether flex items are forced onto one line or can wrap onto multiple lines.
+ */
+@RedwoodYogaApi
+@JvmInline
+public value class FlexWrap private constructor(private val ordinal: Int) {
+
+  override fun toString(): String = when (ordinal) {
+    0 -> "NoWrap"
+    1 -> "Wrap"
+    2 -> "WrapReverse"
+    else -> throw AssertionError()
+  }
+
+  @RedwoodYogaApi
+  public companion object {
+    public val NoWrap: FlexWrap = FlexWrap(0)
+    public val Wrap: FlexWrap = FlexWrap(1)
+    public val WrapReverse: FlexWrap = FlexWrap(2)
+  }
+}
+
+/**
  * Specifies which axis or axes a gap value applies to.
  */
 @RedwoodYogaApi
