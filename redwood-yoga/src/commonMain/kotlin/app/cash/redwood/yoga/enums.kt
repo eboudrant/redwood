@@ -160,3 +160,25 @@ public value class AlignSelf private constructor(private val ordinal: Int) {
     public val Auto: AlignSelf = AlignSelf(5)
   }
 }
+
+/**
+ * Specifies which axis or axes a gap value applies to.
+ */
+@RedwoodYogaApi
+@JvmInline
+public value class Gutter private constructor(private val ordinal: Int) {
+
+  override fun toString(): String = when (ordinal) {
+    0 -> "Column"
+    1 -> "Row"
+    2 -> "All"
+    else -> throw AssertionError()
+  }
+
+  @RedwoodYogaApi // https://github.com/Kotlin/binary-compatibility-validator/issues/91
+  public companion object {
+    public val Column: Gutter = Gutter(0)
+    public val Row: Gutter = Gutter(1)
+    public val All: Gutter = Gutter(2)
+  }
+}

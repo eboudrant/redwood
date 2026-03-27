@@ -21,6 +21,7 @@ import app.cash.redwood.yoga.internal.enums.YGAlign
 import app.cash.redwood.yoga.internal.enums.YGDirection
 import app.cash.redwood.yoga.internal.enums.YGFlexDirection
 import app.cash.redwood.yoga.internal.enums.YGJustify
+import app.cash.redwood.yoga.internal.enums.YGGutter
 import app.cash.redwood.yoga.internal.enums.YGMeasureMode
 import app.cash.redwood.yoga.internal.interfaces.YGMeasureFunc
 
@@ -55,6 +56,13 @@ internal fun AlignItems.toYoga() = when (this) {
   AlignItems.Center -> YGAlign.YGAlignCenter
   AlignItems.Baseline -> YGAlign.YGAlignBaseline
   AlignItems.Stretch -> YGAlign.YGAlignStretch
+  else -> throw AssertionError()
+}
+
+internal fun Gutter.toYoga() = when (this) {
+  Gutter.Column -> YGGutter.YGGutterColumn
+  Gutter.Row -> YGGutter.YGGutterRow
+  Gutter.All -> YGGutter.YGGutterAll
   else -> throw AssertionError()
 }
 

@@ -49,6 +49,15 @@ public class Node internal constructor(
   public var alignSelf: AlignSelf
     get() = native.style.alignSelf().toAlignSelf()
     set(value) = Yoga.YGNodeStyleSetAlignSelf(native, value.toYoga())
+
+  /**
+   * Sets the gap (gutter) spacing between flex items.
+   * Column gap applies between items in a row, row gap applies between wrap lines.
+   */
+  public fun setGap(gutter: Gutter, value: Float) {
+    Yoga.YGNodeStyleSetGap(native, gutter.toYoga(), value)
+  }
+
   public var flexGrow: Float
     get() = Yoga.YGNodeStyleGetFlexGrow(native)
     set(value) = Yoga.YGNodeStyleSetFlexGrow(native, value)
