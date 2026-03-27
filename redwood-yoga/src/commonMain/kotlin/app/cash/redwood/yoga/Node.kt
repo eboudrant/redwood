@@ -46,9 +46,24 @@ public class Node internal constructor(
   public var alignItems: AlignItems
     get() = native.style.alignItems().toAlignItems()
     set(value) = Yoga.YGNodeStyleSetAlignItems(native, value.toYoga())
+  public var alignContent: AlignItems
+    get() = native.style.alignContent().toAlignItems()
+    set(value) = Yoga.YGNodeStyleSetAlignContent(native, value.toYoga())
   public var alignSelf: AlignSelf
     get() = native.style.alignSelf().toAlignSelf()
     set(value) = Yoga.YGNodeStyleSetAlignSelf(native, value.toYoga())
+  public var flexWrap: FlexWrap
+    get() = native.style.flexWrap().toFlexWrap()
+    set(value) = Yoga.YGNodeStyleSetFlexWrap(native, value.toYoga())
+
+  /**
+   * Sets the gap (gutter) spacing between flex items.
+   * Column gap applies between items in a row, row gap applies between wrap lines.
+   */
+  public fun setGap(gutter: Gutter, value: Float) {
+    Yoga.YGNodeStyleSetGap(native, gutter.toYoga(), value)
+  }
+
   public var flexGrow: Float
     get() = Yoga.YGNodeStyleGetFlexGrow(native)
     set(value) = Yoga.YGNodeStyleSetFlexGrow(native, value)
@@ -92,6 +107,24 @@ public class Node internal constructor(
   public var requestedMaxHeight: Float
     get() = Yoga.YGNodeStyleGetMaxHeight(native).value
     set(value) = Yoga.YGNodeStyleSetMaxHeight(native, value)
+  public var requestedWidthPercent: Float
+    get() = Yoga.YGNodeStyleGetWidth(native).value
+    set(value) = Yoga.YGNodeStyleSetWidthPercent(native, value)
+  public var requestedHeightPercent: Float
+    get() = Yoga.YGNodeStyleGetHeight(native).value
+    set(value) = Yoga.YGNodeStyleSetHeightPercent(native, value)
+  public var requestedMinWidthPercent: Float
+    get() = Yoga.YGNodeStyleGetMinWidth(native).value
+    set(value) = Yoga.YGNodeStyleSetMinWidthPercent(native, value)
+  public var requestedMinHeightPercent: Float
+    get() = Yoga.YGNodeStyleGetMinHeight(native).value
+    set(value) = Yoga.YGNodeStyleSetMinHeightPercent(native, value)
+  public var requestedMaxWidthPercent: Float
+    get() = Yoga.YGNodeStyleGetMaxWidth(native).value
+    set(value) = Yoga.YGNodeStyleSetMaxWidthPercent(native, value)
+  public var requestedMaxHeightPercent: Float
+    get() = Yoga.YGNodeStyleGetMaxHeight(native).value
+    set(value) = Yoga.YGNodeStyleSetMaxHeightPercent(native, value)
   public var measureCallback: MeasureCallback?
     get() = (native.measure.noContext as MeasureCallbackCompat?)?.callback
     set(value) = Yoga.YGNodeSetMeasureFunc(native, value?.let(::MeasureCallbackCompat))

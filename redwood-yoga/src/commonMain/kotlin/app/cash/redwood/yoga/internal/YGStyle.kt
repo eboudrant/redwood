@@ -31,6 +31,8 @@ internal class YGStyle {
   val dimensions = Values<YGDimension>(CompactValue.ofAuto().convertToYgValue())
   val minDimensions = Values<YGDimension>()
   val maxDimensions = Values<YGDimension>()
+  var rowGap = 0f
+  var columnGap = 0f
   var aspectRatio = YGFloatOptional()
   var flex = YGFloatOptional()
   var flexGrow = YGFloatOptional()

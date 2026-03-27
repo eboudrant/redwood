@@ -19,6 +19,7 @@ import app.cash.redwood.yoga.internal.enums.YGDirection
 import app.cash.redwood.yoga.internal.enums.YGDisplay
 import app.cash.redwood.yoga.internal.enums.YGEdge
 import app.cash.redwood.yoga.internal.enums.YGFlexDirection
+import app.cash.redwood.yoga.internal.enums.YGGutter
 import app.cash.redwood.yoga.internal.enums.YGJustify
 import app.cash.redwood.yoga.internal.enums.YGLogLevel
 import app.cash.redwood.yoga.internal.enums.YGMeasureMode
@@ -602,6 +603,30 @@ internal object Yoga {
     )
   }
 
+  fun YGNodeStyleSetGap(
+    node: YGNode,
+    gutter: YGGutter,
+    value: Float,
+  ) {
+    when (gutter) {
+      YGGutter.YGGutterColumn -> node.style.columnGap = value
+      YGGutter.YGGutterRow -> node.style.rowGap = value
+      YGGutter.YGGutterAll -> {
+        node.style.columnGap = value
+        node.style.rowGap = value
+      }
+    }
+    node.markDirtyAndPropogate()
+  }
+
+  /**
+   * Returns the gap for the given flex direction axis.
+   * Row direction uses columnGap (gap between columns), Column direction uses rowGap (gap between rows).
+   */
+  fun YGNodeGetGapForAxis(node: YGNode, axis: YGFlexDirection): Float {
+    return if (YGFlexDirectionIsRow(axis)) node.style.columnGap else node.style.rowGap
+  }
+
   fun YGNodeStyleSetOverflow(
     node: YGNode,
     overflow: YGOverflow,
@@ -930,6 +955,78 @@ internal object Yoga {
       YGDimension.YGDimensionHeight,
       maxHeight,
       YGUnit.YGUnitPoint,
+    ) { obj: YGStyle -> obj.maxDimensions }
+  }
+
+  fun YGNodeStyleSetWidthPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionWidth,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.dimensions }
+  }
+
+  fun YGNodeStyleSetHeightPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionHeight,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.dimensions }
+  }
+
+  fun YGNodeStyleSetMinWidthPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionWidth,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.minDimensions }
+  }
+
+  fun YGNodeStyleSetMinHeightPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionHeight,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.minDimensions }
+  }
+
+  fun YGNodeStyleSetMaxWidthPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionWidth,
+      percent,
+      YGUnit.YGUnitPercent,
+    ) { obj: YGStyle -> obj.maxDimensions }
+  }
+
+  fun YGNodeStyleSetMaxHeightPercent(
+    node: YGNode,
+    percent: Float,
+  ) {
+    updateStyleIndexed(
+      node,
+      YGDimension.YGDimensionHeight,
+      percent,
+      YGUnit.YGUnitPercent,
     ) { obj: YGStyle -> obj.maxDimensions }
   }
 
@@ -2297,6 +2394,7 @@ internal object Yoga {
       node.resolveDirection(ownerDirection),
     )
     val isNodeFlexWrap = node.style.flexWrap() != YGWrap.YGWrapNoWrap
+    val mainAxisGap = YGNodeGetGapForAxis(node, mainAxis)
     var endOfLineIndex = startOfLineIndex
     while (endOfLineIndex < node.children.size) {
       val child = node.getChild(endOfLineIndex)
@@ -2312,11 +2410,13 @@ internal object Yoga {
         child, mainAxis,
         child.layout!!.computedFlexBasis, mainAxisownerSize,
       ).unwrap()
-      if (sizeConsumedOnCurrentLineIncludingMinConstraint + flexBasisWithMinAndMaxConstraints + childMarginMainAxis > availableInnerMainDim && isNodeFlexWrap && flexAlgoRowMeasurement.itemsOnLine > 0) {
+      // Account for gap: items after the first need gap space before them
+      val gapBeforeChild = if (flexAlgoRowMeasurement.itemsOnLine > 0) mainAxisGap else 0f
+      if (sizeConsumedOnCurrentLineIncludingMinConstraint + flexBasisWithMinAndMaxConstraints + childMarginMainAxis + gapBeforeChild > availableInnerMainDim && isNodeFlexWrap && flexAlgoRowMeasurement.itemsOnLine > 0) {
         break
       }
-      sizeConsumedOnCurrentLineIncludingMinConstraint += flexBasisWithMinAndMaxConstraints + childMarginMainAxis
-      flexAlgoRowMeasurement.sizeConsumedOnCurrentLine += flexBasisWithMinAndMaxConstraints + childMarginMainAxis
+      sizeConsumedOnCurrentLineIncludingMinConstraint += flexBasisWithMinAndMaxConstraints + childMarginMainAxis + gapBeforeChild
+      flexAlgoRowMeasurement.sizeConsumedOnCurrentLine += flexBasisWithMinAndMaxConstraints + childMarginMainAxis + gapBeforeChild
       flexAlgoRowMeasurement.itemsOnLine++
       if (child.isNodeFlexible()) {
         flexAlgoRowMeasurement.totalFlexGrowFactors += child.resolveFlexGrow()
@@ -2657,6 +2757,7 @@ internal object Yoga {
         }
       }
     }
+    val mainAxisGap = YGNodeGetGapForAxis(node, mainAxis)
     var leadingMainDim = 0f
     var betweenMainDim = 0f
     val justifyContent = node.style.justifyContent()
@@ -2668,7 +2769,7 @@ internal object Yoga {
         YGJustify.YGJustifyFlexEnd -> leadingMainDim =
           collectedFlexItemsValues.remainingFreeSpace
 
-        YGJustify.YGJustifySpaceBetween -> betweenMainDim =
+        YGJustify.YGJustifySpaceBetween -> betweenMainDim +=
           if (collectedFlexItemsValues.itemsOnLine > 1) {
             YGFloatMax(
               collectedFlexItemsValues.remainingFreeSpace,
@@ -2679,15 +2780,15 @@ internal object Yoga {
           }
 
         YGJustify.YGJustifySpaceEvenly -> {
-          betweenMainDim =
-            collectedFlexItemsValues.remainingFreeSpace / (collectedFlexItemsValues.itemsOnLine + 1)
-          leadingMainDim = betweenMainDim
+          val spacePer = collectedFlexItemsValues.remainingFreeSpace / (collectedFlexItemsValues.itemsOnLine + 1)
+          betweenMainDim += spacePer
+          leadingMainDim = spacePer
         }
 
         YGJustify.YGJustifySpaceAround -> {
-          betweenMainDim =
-            collectedFlexItemsValues.remainingFreeSpace / collectedFlexItemsValues.itemsOnLine
-          leadingMainDim = betweenMainDim / 2
+          val spacePer = collectedFlexItemsValues.remainingFreeSpace / collectedFlexItemsValues.itemsOnLine
+          betweenMainDim += spacePer
+          leadingMainDim = spacePer / 2
         }
 
         YGJustify.YGJustifyFlexStart -> {}
@@ -2698,6 +2799,7 @@ internal object Yoga {
     var maxAscentForCurrentLine = 0f
     var maxDescentForCurrentLine = 0f
     val isNodeBaselineLayout = YGIsBaselineLayout(node)
+    var isFirstFlexChild = true
     for (i in startOfLineIndex until collectedFlexItemsValues.endOfLineIndex) {
       val child = node.getChild(i)
       val childStyle = child.style
@@ -2723,6 +2825,11 @@ internal object Yoga {
           if (child.marginLeadingValue(mainAxis).unit == YGUnit.YGUnitAuto) {
             collectedFlexItemsValues.mainDim += collectedFlexItemsValues.remainingFreeSpace / numberOfAutoMarginsOnCurrentLine
           }
+          // Add gap before non-first flex children (matching official Yoga positioning)
+          if (!isFirstFlexChild) {
+            collectedFlexItemsValues.mainDim += mainAxisGap
+          }
+          isFirstFlexChild = false
           if (performLayout) {
             child.setLayoutPosition(
               childLayout!!.position[pos[mainAxis.ordinal].ordinal] + collectedFlexItemsValues.mainDim,
@@ -3028,8 +3135,13 @@ internal object Yoga {
       depth = depth,
       generationCount = generationCount,
     )
+    // Add gap space to total main dimension for overflow check (matching official Yoga)
+    var totalMainDim = totalOuterFlexBasis
+    if (childCount > 1) {
+      totalMainDim += YGNodeGetGapForAxis(node, mainAxis) * (childCount - 1)
+    }
     val flexBasisOverflows = measureModeMainDim != YGMeasureMode.YGMeasureModeUndefined &&
-      totalOuterFlexBasis > availableInnerMainDim
+      totalMainDim > availableInnerMainDim
     if (isNodeFlexWrap && flexBasisOverflows && measureModeMainDim == YGMeasureMode.YGMeasureModeAtMost) {
       measureModeMainDim = YGMeasureMode.YGMeasureModeExactly
     }
@@ -3345,6 +3457,11 @@ internal object Yoga {
           }
         }
       }
+      val crossAxisGap = YGNodeGetGapForAxis(node, crossAxis)
+      // Add cross-axis gap between lines (not before the first line)
+      if (lineCount > 0) {
+        totalLineCrossDim += crossAxisGap
+      }
       totalLineCrossDim += collectedFlexItemsValues.crossDim
       maxLineMainDim = YGFloatMax(maxLineMainDim, collectedFlexItemsValues.mainDim)
       lineCount++
@@ -3382,6 +3499,7 @@ internal object Yoga {
           YGAlign.YGAlignAuto, YGAlign.YGAlignFlexStart, YGAlign.YGAlignBaseline -> {}
         }
       }
+      val crossAxisGapStep8 = YGNodeGetGapForAxis(node, crossAxis)
       var endIndex = 0
       for (i in 0 until lineCount) {
         val startIndex = endIndex
@@ -3435,6 +3553,7 @@ internal object Yoga {
         }
         endIndex = ii
         lineHeight += crossDimLead
+        currentLead += if (i != 0) crossAxisGapStep8 else 0f
         if (performLayout) {
           ii = startIndex
           while (ii < endIndex) {
